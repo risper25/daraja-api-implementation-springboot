@@ -16,5 +16,14 @@ public class MpesaConfiguration {
     private String mediaType;
     private String register_url_endpoint;
     private String simulateC2B_endpoint;
+    private String b2c_transaction_endpoint;
+    private String b2c_result_url;
+    private String b2c_queue_timeout_url;
+    private String b2c_initiator_name;
+    private String b2c_initiator_password;
+    private String b2c_security_credential;
+    private String b2c_originator_conversation_ID;
+    private String b2c_partyA;
+
 
 }

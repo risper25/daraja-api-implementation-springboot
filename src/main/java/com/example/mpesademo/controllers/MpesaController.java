@@ -2,7 +2,11 @@ package com.example.mpesademo.controllers;
 
 import com.example.mpesademo.dtos.*;
 import com.example.mpesademo.services.MpesaService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class MpesaController {
     private final MpesaService mpesaService;
     private final AcknowledgeResponse acknowledgeResponse;
+    private final ObjectMapper objectMapper;
+    Logger logger = LoggerFactory.getLogger(MpesaController.class);
     @GetMapping("/token")
     public ResponseEntity<AccessTokenResponse> getAccessToken(){
-        return ResponseEntity.ok(mpesaService.get_accessToken());
+        return ResponseEntity
+                .ok(mpesaService.get_accessToken());
     }
 
     //todo register url(Registering validation and confirmation urls ..)
@@ -35,5 +42,24 @@ public class MpesaController {
     public ResponseEntity<C2bResponse> simulateC2BTransaction(@RequestBody C2BRequest request){
         return ResponseEntity.ok(mpesaService.simulate_c2b_transaction(request));
     }
+    //==============B2C transaction============
+    @PostMapping("/b2c-transaction")
+    public ResponseEntity<B2CResponse> b2c_transaction(@RequestBody InitialB2CTransactionRequest request) throws JsonProcessingException {
+        return ResponseEntity.ok(mpesaService.b2c_transaction(request));
+    }
+
+    @PostMapping("/b2c-transaction-result")
+    public ResponseEntity<AcknowledgeResponse> b2cTransactionAsyncResult(@RequestBody B2CTransactionAsyncResponse b2CTransactionAsyncResponse) throws JsonProcessingException {
+        logger.info("======================B2C Transaction Response======================");
+        logger.info(objectMapper.writeValueAsString(b2CTransactionAsyncResponse));
+        return ResponseEntity.ok(acknowledgeResponse);
+    }
+    @PostMapping("/b2c-queue-timeout")
+    public ResponseEntity<AcknowledgeResponse> queueTimeout(@RequestBody Object object)  {
+        return ResponseEntity.ok(acknowledgeResponse);
+    }
+
+
+
 
 }
