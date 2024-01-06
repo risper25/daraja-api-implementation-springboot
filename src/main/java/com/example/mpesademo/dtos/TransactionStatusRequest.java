@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class TransactionStatusRequest {
+
     @JsonProperty("Initiator")
     public String initiator;
     @JsonProperty("SecurityCredential")

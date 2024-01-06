@@ -156,7 +156,23 @@ public class MpesaService {
             return null;
         }
     }
+public TransactionStatusSyncResponse get_transaction_status(InitialTransactionStatusRequest initialTransactionStatusRequest){
+    //generate accessToken
+    AccessTokenResponse accessTokenResponse=get_accessToken();
+    String token=accessTokenResponse.getAccess_token();
 
+    TransactionStatusRequest transactionStatusRequest=new TransactionStatusRequest();
+    transactionStatusRequest.setOccasion(initialTransactionStatusRequest.getOccasion());
+    transactionStatusRequest.setCommand_ID(initialTransactionStatusRequest.getCommand_ID());
+    transactionStatusRequest.setRemarks(initialTransactionStatusRequest.getRemarks());
+    transactionStatusRequest.setPartyA(mpesaConfiguration.getB2c_partyA());
+    transactionStatusRequest.setTransaction_ID(initialTransactionStatusRequest.transaction_ID);
+    transactionStatusRequest.setInitiator(mpesaConfiguration.getB2c_initiator_name());
+    transactionStatusRequest.setIdentifierType(initialTransactionStatusRequest.getIdentifierType());
+
+
+        return null;
+}
 
 
     }
