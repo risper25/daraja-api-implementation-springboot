@@ -56,9 +56,26 @@ public class MpesaController {
     }
     @PostMapping("/b2c-queue-timeout")
     public ResponseEntity<AcknowledgeResponse> queueTimeout(@RequestBody Object object)  {
+
         return ResponseEntity.ok(acknowledgeResponse);
     }
+    //===================transaction status=====================
+    @PostMapping("/transaction-status")
+    public ResponseEntity<TransactionStatusSyncResponse> get_transaction_status(@RequestBody InitialTransactionStatusRequest request) throws JsonProcessingException {
+        return ResponseEntity.ok(mpesaService.get_transaction_status(request));
+    }
 
+    @PostMapping("/transaction-status-result")
+    public ResponseEntity<AcknowledgeResponse> get_transactionStatusAsyncResult(@RequestBody TransactionStatusAsyncResponse transactionStatusAsyncResponse) throws JsonProcessingException {
+        logger.info("======================B2C Transaction Response======================");
+        logger.info(objectMapper.writeValueAsString(transactionStatusAsyncResponse));
+        return ResponseEntity.ok(acknowledgeResponse);
+    }
+    @PostMapping("/transaction-status-queue-timeout")
+    public ResponseEntity<AcknowledgeResponse> get_transaction_status_queueTimeout(@RequestBody Object object)  {
+
+        return ResponseEntity.ok(acknowledgeResponse);
+    }
 
 
 
