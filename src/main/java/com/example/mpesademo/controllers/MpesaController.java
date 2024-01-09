@@ -1,6 +1,9 @@
 package com.example.mpesademo.controllers;
 
 import com.example.mpesademo.dtos.*;
+import com.example.mpesademo.dtos.b2c_dtos.B2CResponse;
+import com.example.mpesademo.dtos.b2c_dtos.B2CTransactionAsyncResponse;
+import com.example.mpesademo.dtos.b2c_dtos.InitialB2CTransactionRequest;
 import com.example.mpesademo.services.MpesaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +64,7 @@ public class MpesaController {
     }
     //===================transaction status=====================
     @PostMapping("/transaction-status")
-    public ResponseEntity<TransactionStatusSyncResponse> get_transaction_status(@RequestBody InitialTransactionStatusRequest request) throws JsonProcessingException {
+    public ResponseEntity<TransactionStatusSyncResponse> get_transaction_status(@RequestBody InitialTransactionStatusRequest request) {
         return ResponseEntity.ok(mpesaService.get_transaction_status(request));
     }
 

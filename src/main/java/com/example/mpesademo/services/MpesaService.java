@@ -2,16 +2,17 @@ package com.example.mpesademo.services;
 
 import com.example.mpesademo.config.MpesaConfiguration;
 import com.example.mpesademo.dtos.*;
+import com.example.mpesademo.dtos.b2c_dtos.B2CRequest;
+import com.example.mpesademo.dtos.b2c_dtos.B2CResponse;
+import com.example.mpesademo.dtos.b2c_dtos.InitialB2CTransactionRequest;
 import com.example.mpesademo.utils.Constants;
 import com.example.mpesademo.utils.HelperUtility;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -162,16 +163,51 @@ public TransactionStatusSyncResponse get_transaction_status(InitialTransactionSt
     String token=accessTokenResponse.getAccess_token();
 
     TransactionStatusRequest transactionStatusRequest=new TransactionStatusRequest();
-    transactionStatusRequest.setOccasion(initialTransactionStatusRequest.getOccasion());
-    transactionStatusRequest.setCommand_ID(initialTransactionStatusRequest.getCommand_ID());
-    transactionStatusRequest.setRemarks(initialTransactionStatusRequest.getRemarks());
+    transactionStatusRequest.setCommand_ID("TransactionStatusQuery");
+    transactionStatusRequest.setRemarks("transaction status");
     transactionStatusRequest.setPartyA(mpesaConfiguration.getB2c_partyA());
     transactionStatusRequest.setTransaction_ID(initialTransactionStatusRequest.transaction_ID);
     transactionStatusRequest.setInitiator(mpesaConfiguration.getB2c_initiator_name());
-    transactionStatusRequest.setIdentifierType(initialTransactionStatusRequest.getIdentifierType());
+    transactionStatusRequest.setIdentifierType("4");
+    transactionStatusRequest.setSecurityCredential(mpesaConfiguration.getB2c_security_credential());
+    transactionStatusRequest.setResultURL(mpesaConfiguration.getTransaction_status_result_url());
+    transactionStatusRequest.setQueueTimeOutURL(mpesaConfiguration.getB2c_queue_timeout_url());
+
+    transactionStatusRequest.setOccasion("transaction status");
+
+    RequestBody body=RequestBody.create(Constants.JsonMediaType,
+            Objects.requireNonNull( HelperUtility.toJson(transactionStatusRequest)));
 
 
+    Request request = new Request.Builder()
+            .url(mpesaConfiguration.getTransaction_status_endpoint())
+            .method("POST", body)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Authorization", "Bearer "+token)
+            .build();
+    try {
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            logger.debug("Response -> {}", response);
+            String resp=response.body().string();
+            logger.info(resp);
+            return objectMapper.readValue(resp, TransactionStatusSyncResponse.class);
+        } else {
+            logger.error("Failed to get transaction status . HTTP Status: {}", response.code());
+            logger.info(String.valueOf(transactionStatusRequest));
+            // Handle the error or return an appropriate response
+            return null;
+        }
+    } catch (IOException e) {
+        logger.info("failed to get transaction status result"+e);
+        e.printStackTrace();
         return null;
+    }
+
+
+
+
+
 }
 
 

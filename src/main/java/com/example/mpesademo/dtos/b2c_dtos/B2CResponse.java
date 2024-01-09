@@ -1,4 +1,4 @@
-package com.example.mpesademo.dtos;
+package com.example.mpesademo.dtos.b2c_dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

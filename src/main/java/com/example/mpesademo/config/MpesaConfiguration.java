@@ -24,6 +24,9 @@ public class MpesaConfiguration {
     private String b2c_security_credential;
     private String b2c_originator_conversation_ID;
     private String b2c_partyA;
+    private String transaction_status_endpoint;
+    private String transaction_status_result_url;
+    private String transaction_status_queue_timeout_url;
 
 
 }
