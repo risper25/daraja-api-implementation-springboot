@@ -4,6 +4,9 @@ import com.example.mpesademo.dtos.*;
 import com.example.mpesademo.dtos.b2c_dtos.B2CResponse;
 import com.example.mpesademo.dtos.b2c_dtos.B2CTransactionAsyncResponse;
 import com.example.mpesademo.dtos.b2c_dtos.InitialB2CTransactionRequest;
+import com.example.mpesademo.dtos.stk_push.InitialStkPushRequest;
+import com.example.mpesademo.dtos.stk_push.StkPushResponse;
+import com.example.mpesademo.dtos.stk_push.stk_results.StkPushAsyncResponse;
 import com.example.mpesademo.services.MpesaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,6 +81,19 @@ public class MpesaController {
     public ResponseEntity<AcknowledgeResponse> get_transaction_status_queueTimeout(@RequestBody Object object)  {
 
         return ResponseEntity.ok(acknowledgeResponse);
+    }
+
+    //===================mpesa push stk=============================
+    @PostMapping("/stk-push")
+    public ResponseEntity<StkPushResponse> stk_push_simulate(@RequestBody InitialStkPushRequest request){
+        return ResponseEntity.ok(mpesaService.stk_push(request));
+    }
+    @PostMapping("/express-results")
+    public ResponseEntity<AcknowledgeResponse> getStkPushResults(@RequestBody StkPushAsyncResponse stkPushAsyncResponse) throws JsonProcessingException {
+        logger.info("======================StkPushAsyncResponse ======================");
+        logger.info(objectMapper.writeValueAsString(stkPushAsyncResponse));
+        return ResponseEntity.ok(acknowledgeResponse);
+
     }
 
 

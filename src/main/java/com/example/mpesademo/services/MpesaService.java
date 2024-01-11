@@ -5,6 +5,9 @@ import com.example.mpesademo.dtos.*;
 import com.example.mpesademo.dtos.b2c_dtos.B2CRequest;
 import com.example.mpesademo.dtos.b2c_dtos.B2CResponse;
 import com.example.mpesademo.dtos.b2c_dtos.InitialB2CTransactionRequest;
+import com.example.mpesademo.dtos.stk_push.InitialStkPushRequest;
+import com.example.mpesademo.dtos.stk_push.StkPushRequest;
+import com.example.mpesademo.dtos.stk_push.StkPushResponse;
 import com.example.mpesademo.utils.Constants;
 import com.example.mpesademo.utils.HelperUtility;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Objects;
 
 @Service
@@ -204,8 +208,56 @@ public TransactionStatusSyncResponse get_transaction_status(InitialTransactionSt
         return null;
     }
 
+}
+public StkPushResponse stk_push(InitialStkPushRequest initialStkPushRequest){
+    //generate accessToken
+    AccessTokenResponse accessTokenResponse=get_accessToken();
+    String token=accessTokenResponse.getAccess_token();
+    //Transaction timestamp
+    String timeStamp=HelperUtility.generateTransactionTimestamp();
+    //Generate password
+    String password=HelperUtility.getStkPushPassword(initialStkPushRequest.getBusinessShortCode(),mpesaConfiguration.getStk_push_pass_key(),timeStamp);
+
+    StkPushRequest stkPushRequest=new StkPushRequest();
+    stkPushRequest.setBusinessShortCode(initialStkPushRequest.getBusinessShortCode());
+    stkPushRequest.setPassword(password);
+    stkPushRequest.setTimestamp(timeStamp);
+    stkPushRequest.setTransactionType(initialStkPushRequest.getTransactionType());
+    stkPushRequest.setAmount(initialStkPushRequest.getAmount());
+    stkPushRequest.setAccountReference(initialStkPushRequest.getAccountReference());
+    stkPushRequest.setCallBackURL(mpesaConfiguration.getStk_push_callBackURL());
+    stkPushRequest.setPhoneNumber(initialStkPushRequest.getPhoneNumber());
+    stkPushRequest.setPartyA(initialStkPushRequest.getPartyA());
+    stkPushRequest.setPartyB(initialStkPushRequest.getPartyB());
+    stkPushRequest.setTransactionDesc(initialStkPushRequest.getTransactionDesc());
+    RequestBody body=RequestBody.create(Constants.JsonMediaType,
+            Objects.requireNonNull( HelperUtility.toJson(stkPushRequest)));
 
 
+    Request request = new Request.Builder()
+            .url(mpesaConfiguration.getStk_push_endpoint())
+            .method("POST", body)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Authorization", "Bearer "+token)
+            .build();
+    try {
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            logger.debug("Response -> {}", response);
+            String resp=response.body().string();
+            logger.info(resp);
+            return objectMapper.readValue(resp, StkPushResponse.class);
+        } else {
+            logger.error("Failed to push stk . HTTP Status: {}", response.code());
+
+            // Handle the error or return an appropriate response
+            return null;
+        }
+    } catch (IOException e) {
+        logger.info("failed to push mpesa stk"+e);
+        e.printStackTrace();
+        return null;
+    }
 
 
 }

@@ -27,6 +27,10 @@ public class MpesaConfiguration {
     private String transaction_status_endpoint;
     private String transaction_status_result_url;
     private String transaction_status_queue_timeout_url;
+    private String stk_push_endpoint;
+    private String stk_push_callBackURL;
+    private String stk_push_pass_key;
+
 
 
 }
