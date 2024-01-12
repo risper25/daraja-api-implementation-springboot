@@ -50,6 +50,7 @@ public class MpesaService {
         //generate accessToken
         AccessTokenResponse accessTokenResponse=get_accessToken();
         String token=accessTokenResponse.getAccess_token();
+
         logger.info("token------: {}",token);
         RegisterUrlRequest registerUrlRequest=new RegisterUrlRequest(
                 mpesaConfiguration.getShortCode(),
@@ -209,16 +210,17 @@ public TransactionStatusSyncResponse get_transaction_status(InitialTransactionSt
     }
 
 }
-public StkPushResponse stk_push(InitialStkPushRequest initialStkPushRequest){
+public StkPushResponse stk_push(InitialStkPushRequest initialStkPushRequest) {
     //generate accessToken
-    AccessTokenResponse accessTokenResponse=get_accessToken();
-    String token=accessTokenResponse.getAccess_token();
+    AccessTokenResponse accessTokenResponse = get_accessToken();
+    String token = accessTokenResponse.getAccess_token();
+    logger.info("token------: {}",token);
     //Transaction timestamp
-    String timeStamp=HelperUtility.generateTransactionTimestamp();
+    String timeStamp = HelperUtility.generateTransactionTimestamp();
     //Generate password
-    String password=HelperUtility.getStkPushPassword(initialStkPushRequest.getBusinessShortCode(),mpesaConfiguration.getStk_push_pass_key(),timeStamp);
+    String password = HelperUtility.getStkPushPassword(String.valueOf(initialStkPushRequest.getBusinessShortCode()), mpesaConfiguration.getStk_push_pass_key(), timeStamp);
 
-    StkPushRequest stkPushRequest=new StkPushRequest();
+    StkPushRequest stkPushRequest = new StkPushRequest();
     stkPushRequest.setBusinessShortCode(initialStkPushRequest.getBusinessShortCode());
     stkPushRequest.setPassword(password);
     stkPushRequest.setTimestamp(timeStamp);
@@ -230,34 +232,36 @@ public StkPushResponse stk_push(InitialStkPushRequest initialStkPushRequest){
     stkPushRequest.setPartyA(initialStkPushRequest.getPartyA());
     stkPushRequest.setPartyB(initialStkPushRequest.getPartyB());
     stkPushRequest.setTransactionDesc(initialStkPushRequest.getTransactionDesc());
-    RequestBody body=RequestBody.create(Constants.JsonMediaType,
-            Objects.requireNonNull( HelperUtility.toJson(stkPushRequest)));
+    RequestBody body = RequestBody.create(Constants.JsonMediaType,
+            Objects.requireNonNull(HelperUtility.toJson(stkPushRequest)));
 
-
+    logger.info(HelperUtility.toJson(stkPushRequest));
     Request request = new Request.Builder()
             .url(mpesaConfiguration.getStk_push_endpoint())
             .method("POST", body)
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Bearer "+token)
+            .addHeader("Authorization", "Bearer " + token)
             .build();
     try {
+
         Response response = client.newCall(request).execute();
         if (response.isSuccessful()) {
             logger.debug("Response -> {}", response);
-            String resp=response.body().string();
+            String resp = response.body().string();
             logger.info(resp);
             return objectMapper.readValue(resp, StkPushResponse.class);
         } else {
-            logger.error("Failed to push stk . HTTP Status: {}", response.code());
-
+            logger.error("Failed to push stk . HTTP Status: {},{}", response.code(),response.message());
+            throw new Exception("Failed to push stk");
             // Handle the error or return an appropriate response
-            return null;
+
         }
-    } catch (IOException e) {
-        logger.info("failed to push mpesa stk"+e);
+    } catch (Exception e) {
+        logger.info("failed to push mpesa stk", e.getMessage(), e);
         e.printStackTrace();
         return null;
     }
+
 
 
 }

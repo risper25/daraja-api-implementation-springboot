@@ -8,11 +8,13 @@ import com.example.mpesademo.dtos.stk_push.InitialStkPushRequest;
 import com.example.mpesademo.dtos.stk_push.StkPushResponse;
 import com.example.mpesademo.dtos.stk_push.stk_results.StkPushAsyncResponse;
 import com.example.mpesademo.services.MpesaService;
+import com.example.mpesademo.utils.HelperUtility;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,8 +87,26 @@ public class MpesaController {
 
     //===================mpesa push stk=============================
     @PostMapping("/stk-push")
-    public ResponseEntity<StkPushResponse> stk_push_simulate(@RequestBody InitialStkPushRequest request){
-        return ResponseEntity.ok(mpesaService.stk_push(request));
+    public ResponseEntity<StkPushResponse> stk_push_simulate(@RequestBody InitialStkPushRequest request) {
+        try {
+            // Log incoming request details
+            logger.info("Received STK push simulation request: {}", HelperUtility.toJson(request));
+
+            // Perform input validation if needed
+
+            // Call the service method
+            StkPushResponse response = mpesaService.stk_push(request);
+
+            // Log the response details
+            logger.info("STK push simulation response: {}", HelperUtility.toJson(response));
+
+            // Return the response entity
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Log any exceptions
+            logger.error("Error processing STK push simulation request", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
     @PostMapping("/express-results")
     public ResponseEntity<AcknowledgeResponse> getStkPushResults(@RequestBody StkPushAsyncResponse stkPushAsyncResponse) throws JsonProcessingException {

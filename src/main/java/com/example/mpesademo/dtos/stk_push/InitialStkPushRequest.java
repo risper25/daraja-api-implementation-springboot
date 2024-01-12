@@ -6,18 +6,18 @@ import lombok.Data;
 @Data
 public class InitialStkPushRequest {
     @JsonProperty("BusinessShortCode")
-    public String businessShortCode;
+    public int businessShortCode;
 
     @JsonProperty("TransactionType")
     public String transactionType;
     @JsonProperty("Amount")
-    public String amount;
+    public int amount;
     @JsonProperty("PartyA")
-    public String partyA;
+    public long partyA;
     @JsonProperty("PartyB")
-    public String partyB;
+    public int partyB;
     @JsonProperty("PhoneNumber")
-    public String phoneNumber;
+    public long phoneNumber;
     @JsonProperty("AccountReference")
     public String accountReference;
     @JsonProperty("TransactionDesc")
